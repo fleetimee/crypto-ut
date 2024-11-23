@@ -217,18 +217,14 @@ const sortBy = ref("rank");
 
 const isLoading = ref(false);
 
-// Modify the sortBy watcher to show loading state
 watch(sortBy, async () => {
   isLoading.value = true;
-  // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 800));
   isLoading.value = false;
 });
 
-// Modify the searchQuery watcher to show loading state
 watch(searchQuery, async () => {
   isLoading.value = true;
-  // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 400));
   isLoading.value = false;
 });
