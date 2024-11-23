@@ -1,0 +1,310 @@
+/* For information on how to create your own theme, please see:
+http://ionicframework.com/docs/theming/ */
+
+:root {
+  /* UT Brand Colors */
+  --ut-blue: #00549e;
+  --ut-blue-light: #0072ce;
+  --ut-blue-lighter: #e5f0f9;
+  --ut-white: #ffffff;
+
+  /* Custom colors based on UT theme */
+  --app-background: var(--ut-blue-lighter);
+  --item-background: var(--ut-white);
+  --item-background-striped: #f8fbff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #566b85;
+  --text-tertiary: #455771;
+  --accent-blue: var(--ut-blue);
+  --success-green: #26ad75;
+  --danger-red: #ea3943;
+  --shadow-sm: 0 1px 3px rgba(0, 84, 158, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 84, 158, 0.12);
+  --chart-height: 400px;
+  --stat-card-bg: #f8f9fa;
+  --price-up-color: #26ad75;
+  --price-down-color: #ea3943;
+  --search-text: #1a1a1a;
+  --search-placeholder: #666;
+
+  /* Override header colors */
+  --ion-toolbar-background: var(--ut-blue);
+  --ion-toolbar-color: var(--ut-white);
+}
+
+/* Common Crypto List Styles */
+.crypto-list-item {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --inner-padding-end: 12px;
+  --min-height: auto;
+  --background: var(--item-background);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 1px;
+  --ion-text-color: var(--text-primary);
+  --ion-label-color: var(--text-primary);
+}
+
+.crypto-list-item:nth-child(even) {
+  --background: var(--item-background-striped);
+}
+
+.crypto-list-item:hover {
+  --background: var(--item-background);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  z-index: 1;
+  border-left: 3px solid var(--ut-blue);
+}
+
+.crypto-list-item ion-label {
+  margin: 16px 16px 16px 0;
+  padding: 4px 0;
+  color: var(--text-primary);
+}
+
+.crypto-list-item h2 {
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.crypto-list-item h3 {
+  color: var(--text-secondary);
+  font-size: 0.9em;
+  margin: 4px 0;
+}
+
+.crypto-list-item p {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 95%;
+  color: var(--text-tertiary);
+  margin: 4px 0 0 0;
+}
+
+.crypto-list-item .date {
+  align-items: center;
+  display: flex;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.crypto-list-item ion-note {
+  font-size: 1rem;
+  margin-right: 8px;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
+.crypto-dot {
+  display: block;
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  align-self: center;
+  margin: 0 16px;
+  transition: transform 0.2s ease;
+}
+
+.crypto-dot-positive {
+  background: var(--success-green);
+}
+
+.crypto-dot-negative {
+  background: var(--danger-red);
+}
+
+.crypto-list-item:hover .crypto-dot {
+  transform: scale(1.2);
+}
+
+/* Common page styles */
+.crypto-content {
+  --background: var(--app-background);
+}
+
+.crypto-container {
+  background: var(--item-background);
+  margin-top: 16px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 84, 158, 0.1);
+}
+
+/* Add these new styles for the detail view */
+ion-item {
+  --ion-text-color: var(--text-primary);
+  --ion-label-color: var(--text-primary);
+}
+
+ion-list ion-item {
+  --ion-text-color: var(--text-primary);
+  --ion-label-color: var(--text-primary);
+}
+
+ion-note {
+  --ion-text-color: var(--accent-blue);
+}
+
+/* Make sure all text elements are visible */
+h1,
+h2,
+h3,
+p,
+ion-label {
+  color: var(--text-primary);
+}
+
+/* Add new detail page styles */
+.crypto-detail-header {
+  background: var(--item-background);
+  padding: 24px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: var(--ut-blue-lighter);
+  border-bottom: 1px solid rgba(0, 84, 158, 0.1);
+}
+
+.crypto-detail-header h1 {
+  font-size: 24px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crypto-detail-price {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crypto-detail-change {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.crypto-detail-change.positive {
+  background: rgba(38, 173, 117, 0.1);
+  color: var(--price-up-color);
+}
+
+.crypto-detail-change.negative {
+  background: rgba(234, 57, 67, 0.1);
+  color: var(--price-down-color);
+}
+
+.crypto-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.crypto-stat-card {
+  background: var(--stat-card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--ut-white);
+  border: 1px solid rgba(0, 84, 158, 0.1);
+}
+
+.crypto-stat-card h3 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.crypto-stat-card p {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.crypto-rank-badge {
+  background: var(--accent-blue);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ut-blue-light);
+}
+
+/* Update segment control colors */
+.custom-segment {
+  --background: var(--ut-blue-lighter) !important;
+}
+
+ion-segment-button {
+  --background-checked: var(--ut-blue) !important;
+  --color: var(--ut-blue) !important;
+  --color-checked: var(--ut-white) !important;
+  font-weight: 500;
+}
+
+/* Add this new style to ensure text color */
+ion-segment-button.segment-button-checked {
+  --color: var(--ut-white) !important;
+  color: var(--ut-white) !important;
+}
+
+ion-segment-button.segment-button-checked ion-label {
+  color: var(--ut-white) !important;
+}
+
+/* Update stat cards */
+.stat-card {
+  border: 1px solid rgba(0, 84, 158, 0.1);
+}
+
+.stat-card::before {
+  background: linear-gradient(to right, var(--ut-blue), transparent) !important;
+}
+
+.stat-icon {
+  color: var(--ut-blue) !important;
+}
+
+/* Update search bar */
+.modern-searchbar {
+  --background: var(--ut-white) !important;
+  --icon-color: var(--ut-blue) !important;
+  --placeholder-color: var(--text-secondary) !important;
+  border: 1px solid rgba(0, 84, 158, 0.1);
+}
+
+/* Add header style */
+ion-header ion-toolbar {
+  --background: var(--ut-blue);
+  --color: var(--ut-white);
+}
+
+ion-header ion-toolbar ion-title {
+  color: var(--ut-white);
+}
+
+/* Update dominance icons colors */
+.crypto-symbol.btc {
+  color: var(--ut-blue);
+}
+
+.crypto-symbol.eth {
+  color: var(--ut-blue-light);
+}
+
+/* Additional visual improvements */
+.stat-card:hover {
+  border-color: var(--ut-blue);
+}
