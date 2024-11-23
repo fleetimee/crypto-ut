@@ -117,9 +117,22 @@
       <ion-list v-else class="crypto-list">
         <MessageListItem
           v-for="crypto in filteredCryptos"
-          :key="crypto.id"
+          :key="`${crypto.id}-${crypto.rank}`"
           :crypto="crypto"
         />
+
+        <ion-infinite-scroll
+          :disabled="isAllLoaded"
+          threshold="100px"
+          @ionInfinite="loadMore($event)"
+          position="bottom"
+        >
+          <ion-infinite-scroll-content
+            loading-spinner="bubbles"
+            loading-text="Loading more cryptocurrencies..."
+          >
+          </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
       </ion-list>
 
       <div v-if="filteredCryptos.length === 0" class="no-results">
@@ -146,6 +159,8 @@ import {
   IonSegmentButton,
   IonLabel,
   IonText,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
 } from "@ionic/vue";
 import MessageListItem from "@/components/MessageListItem.vue";
 import { ref, computed, onMounted, watch } from "vue";
@@ -161,11 +176,30 @@ import {
 
 const cryptos = ref<Crypto[]>([]);
 
-const fetchData = async () => {
+const currentPage = ref(0);
+const isAllLoaded = ref(false);
+const itemsPerPage = 100;
+
+const sortCache = new Map();
+
+const fetchData = async (start = 0) => {
   try {
-    const response = await fetch("https://api.coinlore.net/api/tickers/");
+    const response = await fetch(
+      `https://api.coinlore.net/api/tickers/?start=${start}&limit=${itemsPerPage}`
+    );
     const json = await response.json();
-    cryptos.value = json.data;
+
+    if (start === 0) {
+      cryptos.value = json.data;
+    } else {
+      cryptos.value = [...cryptos.value, ...json.data];
+    }
+
+    sortCache.clear();
+
+    if (json.data.length < itemsPerPage) {
+      isAllLoaded.value = true;
+    }
   } catch (error) {
     console.error("Error fetching crypto data:", error);
   }
@@ -203,8 +237,19 @@ const getChangeClass = (change: string | undefined) => {
 };
 
 const refresh = async (ev: CustomEvent) => {
-  await Promise.all([fetchData(), fetchGlobalStats()]);
+  currentPage.value = 0;
+  isAllLoaded.value = false;
+  await Promise.all([fetchData(0), fetchGlobalStats()]);
   ev.detail.complete();
+};
+
+const loadMore = async (ev: CustomEvent) => {
+  try {
+    currentPage.value++;
+    await fetchData(currentPage.value * itemsPerPage);
+  } finally {
+    (ev.target as HTMLIonInfiniteScrollElement).complete();
+  }
 };
 
 onMounted(() => {
@@ -217,20 +262,16 @@ const sortBy = ref("rank");
 
 const isLoading = ref(false);
 
-watch(sortBy, async () => {
-  isLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 800));
-  isLoading.value = false;
+watch(sortBy, () => {
+  sortCache.clear();
 });
 
-watch(searchQuery, async () => {
-  isLoading.value = true;
-  await new Promise((resolve) => setTimeout(resolve, 400));
-  isLoading.value = false;
+watch(searchQuery, () => {
+  sortCache.clear();
 });
 
 const filteredCryptos = computed(() => {
-  let result = cryptos.value;
+  let result = [...cryptos.value];
 
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
@@ -241,20 +282,28 @@ const filteredCryptos = computed(() => {
     );
   }
 
-  switch (sortBy.value) {
-    case "rank":
-      return result.sort((a, b) => Number(a.rank) - Number(b.rank));
-    case "gainers":
-      return result.sort(
-        (a, b) => Number(b.percent_change_24h) - Number(a.percent_change_24h)
-      );
-    case "losers":
-      return result.sort(
-        (a, b) => Number(a.percent_change_24h) - Number(b.percent_change_24h)
-      );
-    default:
-      return result;
+  const sortKey = `${sortBy.value}-${result.length}`;
+  if (!sortCache.has(sortKey)) {
+    const sorted = [...result];
+    switch (sortBy.value) {
+      case "rank":
+        sorted.sort((a, b) => Number(a.rank) - Number(b.rank));
+        break;
+      case "gainers":
+        sorted.sort(
+          (a, b) => Number(b.percent_change_24h) - Number(a.percent_change_24h)
+        );
+        break;
+      case "losers":
+        sorted.sort(
+          (a, b) => Number(a.percent_change_24h) - Number(b.percent_change_24h)
+        );
+        break;
+    }
+    sortCache.set(sortKey, sorted);
   }
+
+  return sortCache.get(sortKey) || result;
 });
 </script>
 
@@ -583,5 +632,16 @@ ion-list {
   :root {
     --skeleton-color: rgba(255, 255, 255, 0.1);
   }
+}
+
+ion-infinite-scroll-content {
+  min-height: 70px;
+  padding: 16px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+ion-infinite-scroll-content::part(spinner) {
+  color: var(--accent-blue);
 }
 </style>
