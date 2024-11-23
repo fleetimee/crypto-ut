@@ -196,7 +196,6 @@ const sortBy = ref("rank");
 const filteredCryptos = computed(() => {
   let result = cryptos.value;
 
-  // Apply search filter
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase();
     result = result.filter(
@@ -206,7 +205,6 @@ const filteredCryptos = computed(() => {
     );
   }
 
-  // Apply sorting
   switch (sortBy.value) {
     case "rank":
       return result.sort((a, b) => Number(a.rank) - Number(b.rank));

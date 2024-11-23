@@ -144,7 +144,7 @@ onMounted(async () => {
       `https://api.coinlore.net/api/ticker/?id=${route.params.id}`
     );
     const data = await response.json();
-    crypto.value = data[0]; // API returns an array with single item
+    crypto.value = data[0];
   } catch (error) {
     console.error("Error fetching crypto data:", error);
   }
