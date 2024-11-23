@@ -9,82 +9,122 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true" class="crypto-content" v-if="crypto">
-      <div class="crypto-detail-header">
-        <div class="crypto-price-header">
-          <h2 class="crypto-title">{{ crypto.name }} ({{ crypto.symbol }})</h2>
-          <div class="crypto-rank">#{{ crypto.rank }}</div>
-          <div class="crypto-main-price">
-            ${{ formatPrice(crypto.price_usd) }}
+    <ion-content :fullscreen="true" class="crypto-content">
+      <div v-if="isLoading">
+        <div class="crypto-detail-header">
+          <div class="crypto-price-header skeleton">
+            <div class="skeleton-text-large"></div>
+            <div class="skeleton-text-small"></div>
+            <div class="skeleton-text-xlarge"></div>
+            <div class="skeleton-price-change"></div>
           </div>
-          <div
-            :class="[
-              'crypto-price-change',
-              Number(crypto.percent_change_24h) >= 0 ? 'positive' : 'negative',
-            ]"
-          >
-            {{ crypto.percent_change_24h }}% (24h)
+        </div>
+
+        <div class="crypto-stats-grid">
+          <div v-for="i in 4" :key="i" class="crypto-stat-card skeleton">
+            <div class="skeleton-text-small"></div>
+            <div class="skeleton-text-medium"></div>
+          </div>
+        </div>
+
+        <div class="crypto-container ion-padding">
+          <div class="skeleton-text-medium mb-4"></div>
+          <div class="crypto-price-list">
+            <div v-for="i in 3" :key="i" class="price-stat-row skeleton">
+              <div class="skeleton-text-small"></div>
+              <div class="skeleton-text-medium"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="crypto-stats-grid">
-        <div class="crypto-stat-card">
-          <h3>Market Cap</h3>
-          <p>${{ formatCompactNumber(crypto.market_cap_usd) }}</p>
-        </div>
-        <div class="crypto-stat-card">
-          <h3>24h Volume</h3>
-          <p>${{ formatCompactNumber(crypto.volume24) }}</p>
-        </div>
-        <div class="crypto-stat-card">
-          <h3>Circulating Supply</h3>
-          <p>{{ formatCompactNumber(crypto.csupply) }} {{ crypto.symbol }}</p>
-        </div>
-        <div class="crypto-stat-card">
-          <h3>Max Supply</h3>
-          <p>{{ formatCompactNumber(crypto.msupply) }} {{ crypto.symbol }}</p>
-        </div>
-      </div>
-
-      <div class="crypto-container ion-padding">
-        <h2>Price Statistics</h2>
-        <div class="crypto-price-list">
-          <div class="price-stat-row">
-            <div class="price-stat-label">Price USD</div>
-            <div class="price-stat-value">
+      <div v-else-if="crypto">
+        <div class="crypto-detail-header">
+          <div class="crypto-price-header">
+            <h2 class="crypto-title">
+              {{ crypto.name }} ({{ crypto.symbol }})
+            </h2>
+            <div class="crypto-rank">#{{ crypto.rank }}</div>
+            <div class="crypto-main-price">
               ${{ formatPrice(crypto.price_usd) }}
             </div>
-          </div>
-          <div class="price-stat-row">
-            <div class="price-stat-label">Price BTC</div>
-            <div class="price-stat-value">{{ crypto.price_btc }} BTC</div>
-          </div>
-          <div class="price-stat-row">
-            <div class="price-stat-label">Trading Volume</div>
-            <div class="price-stat-value">
-              ${{ formatCompactNumber(crypto.volume24) }}
-              <span class="volume-native"
-                >({{ formatCompactNumber(crypto.volume24_native) }}
-                {{ crypto.symbol }})</span
-              >
+            <div
+              :class="[
+                'crypto-price-change',
+                Number(crypto.percent_change_24h) >= 0
+                  ? 'positive'
+                  : 'negative',
+              ]"
+            >
+              {{ crypto.percent_change_24h }}% (24h)
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="crypto-container ion-padding">
-        <h2>Price Changes</h2>
         <div class="crypto-stats-grid">
-          <div
-            v-for="(change, period) in priceChanges"
-            :key="period"
-            class="crypto-stat-card"
-          >
-            <h3>{{ period }}</h3>
-            <p :class="Number(change) >= 0 ? 'text-success' : 'text-danger'">
-              {{ change }}%
+          <div class="crypto-stat-card">
+            <h3>Market Cap</h3>
+            <p>${{ formatCompactNumber(crypto.market_cap_usd) }}</p>
+          </div>
+          <div class="crypto-stat-card">
+            <h3>24h Volume</h3>
+            <p>${{ formatCompactNumber(crypto.volume24) }}</p>
+          </div>
+          <div class="crypto-stat-card">
+            <h3>Circulating Supply</h3>
+            <p>{{ formatCompactNumber(crypto.csupply) }} {{ crypto.symbol }}</p>
+          </div>
+          <div class="crypto-stat-card">
+            <h3>Max Supply</h3>
+            <p>
+              {{
+                crypto.msupply === "0"
+                  ? "Unlimited"
+                  : `${formatCompactNumber(crypto.msupply)} ${crypto.symbol}`
+              }}
             </p>
+          </div>
+        </div>
+
+        <div class="crypto-container ion-padding">
+          <h2>Price Statistics</h2>
+          <div class="crypto-price-list">
+            <div class="price-stat-row">
+              <div class="price-stat-label">Price USD</div>
+              <div class="price-stat-value">
+                ${{ formatPrice(crypto.price_usd) }}
+              </div>
+            </div>
+            <div class="price-stat-row">
+              <div class="price-stat-label">Price BTC</div>
+              <div class="price-stat-value">{{ crypto.price_btc }} BTC</div>
+            </div>
+            <div class="price-stat-row">
+              <div class="price-stat-label">Trading Volume</div>
+              <div class="price-stat-value">
+                ${{ formatCompactNumber(crypto.volume24) }}
+                <span class="volume-native"
+                  >({{ formatCompactNumber(crypto.volume24_native) }}
+                  {{ crypto.symbol }})</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="crypto-container ion-padding">
+          <h2>Price Changes</h2>
+          <div class="crypto-stats-grid">
+            <div
+              v-for="(change, period) in priceChanges"
+              :key="period"
+              class="crypto-stat-card"
+            >
+              <h3>{{ period }}</h3>
+              <p :class="Number(change) >= 0 ? 'text-success' : 'text-danger'">
+                {{ change }}%
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -107,6 +147,7 @@ import type { Crypto } from "@/types";
 
 const route = useRoute();
 const crypto = ref<Crypto | null>(null);
+const isLoading = ref(true);
 
 const formatPrice = (price: string) => {
   const num = Number(price);
@@ -147,6 +188,8 @@ onMounted(async () => {
     crypto.value = data[0];
   } catch (error) {
     console.error("Error fetching crypto data:", error);
+  } finally {
+    isLoading.value = false;
   }
 });
 </script>
@@ -377,5 +420,83 @@ p {
 .crypto-detail-header h1,
 .crypto-detail-price {
   display: none;
+}
+
+/* Skeleton Styles */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-text-small,
+.skeleton-text-medium,
+.skeleton-text-large,
+.skeleton-text-xlarge,
+.skeleton-price-change {
+  background: var(--skeleton-color);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-text-small {
+  height: 14px;
+  width: 80px;
+}
+
+.skeleton-text-medium {
+  height: 16px;
+  width: 120px;
+}
+
+.skeleton-text-large {
+  height: 20px;
+  width: 200px;
+}
+
+.skeleton-text-xlarge {
+  height: 40px;
+  width: 160px;
+  margin: 16px 0 8px;
+}
+
+.skeleton-price-change {
+  height: 28px;
+  width: 100px;
+  border-radius: 6px;
+  margin: 8px auto;
+}
+
+.mb-4 {
+  margin-bottom: 24px;
+}
+
+.crypto-price-header.skeleton {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+:root {
+  --skeleton-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-color: rgba(255, 255, 255, 0.1);
+  }
 }
 </style>

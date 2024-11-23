@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Crypto Markets</ion-title>
+        <ion-title>NOVIAN ANDIKA - 050193163</ion-title>
       </ion-toolbar>
       <ion-toolbar>
         <ion-searchbar
@@ -92,7 +92,29 @@
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
 
-      <ion-list class="crypto-list">
+      <div v-if="isLoading" class="crypto-list">
+        <div v-for="n in 10" :key="n" class="skeleton-item">
+          <div class="skeleton-container">
+            <div class="skeleton-main">
+              <div class="skeleton-circle"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-text-short"></div>
+                <div class="skeleton-text-shorter"></div>
+              </div>
+            </div>
+            <div class="skeleton-price">
+              <div class="skeleton-text-medium"></div>
+              <div class="skeleton-text-short"></div>
+            </div>
+            <div class="skeleton-market">
+              <div class="skeleton-text-short"></div>
+              <div class="skeleton-text-shorter"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ion-list v-else class="crypto-list">
         <MessageListItem
           v-for="crypto in filteredCryptos"
           :key="crypto.id"
@@ -126,7 +148,7 @@ import {
   IonText,
 } from "@ionic/vue";
 import MessageListItem from "@/components/MessageListItem.vue";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import type { Crypto, GlobalStats } from "@/types";
 import {
   analytics,
@@ -192,6 +214,24 @@ onMounted(() => {
 
 const searchQuery = ref("");
 const sortBy = ref("rank");
+
+const isLoading = ref(false);
+
+// Modify the sortBy watcher to show loading state
+watch(sortBy, async () => {
+  isLoading.value = true;
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 800));
+  isLoading.value = false;
+});
+
+// Modify the searchQuery watcher to show loading state
+watch(searchQuery, async () => {
+  isLoading.value = true;
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  isLoading.value = false;
+});
 
 const filteredCryptos = computed(() => {
   let result = cryptos.value;
@@ -400,5 +440,152 @@ ion-list {
   height: 3px;
   background: linear-gradient(to right, var(--accent-blue), transparent);
   opacity: 0.5;
+}
+
+.skeleton-item {
+  background: var(--item-background);
+  padding: 16px;
+  margin-bottom: 1px;
+  position: relative;
+  overflow: hidden; /* Important for shimmer effect */
+}
+
+/* Add shimmer effect overlay */
+.skeleton-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.2) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-circle,
+.skeleton-text-short,
+.skeleton-text-shorter,
+.skeleton-text-medium {
+  background: var(--skeleton-color);
+  /* Remove the pulse animation since we're using shimmer */
+  animation: none;
+}
+
+/* Update skeleton color to be slightly darker for better shimmer visibility */
+:root {
+  --skeleton-color: rgba(0, 0, 0, 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .skeleton-item::after {
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0,
+      rgba(255, 255, 255, 0.03) 20%,
+      rgba(255, 255, 255, 0.1) 60%,
+      rgba(255, 255, 255, 0)
+    );
+  }
+}
+
+.skeleton-container {
+  display: grid;
+  grid-template-columns: 2.5fr 1.5fr 2fr;
+  gap: 12px;
+  width: 100%;
+  align-items: center;
+}
+
+.skeleton-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skeleton-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--skeleton-color);
+}
+
+.skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.skeleton-text-short {
+  height: 14px;
+  width: 80px;
+  background: var(--skeleton-color);
+  border-radius: 4px;
+}
+
+.skeleton-text-shorter {
+  height: 12px;
+  width: 60px;
+  background: var(--skeleton-color);
+  border-radius: 4px;
+}
+
+.skeleton-text-medium {
+  height: 14px;
+  width: 100px;
+  background: var(--skeleton-color);
+  border-radius: 4px;
+}
+
+.skeleton-price {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.skeleton-market {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+:root {
+  --skeleton-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-color: rgba(255, 255, 255, 0.1);
+  }
 }
 </style>

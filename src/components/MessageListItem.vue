@@ -59,6 +59,7 @@ const formatPrice = (price: string) => {
 };
 
 const formatCompactNumber = (number: string) => {
+  if (number === "0") return "Unlimited";
   return Number(number).toLocaleString(undefined, {
     notation: "compact",
     compactDisplay: "short",
