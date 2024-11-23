@@ -14,6 +14,7 @@ export interface Crypto {
   tsupply: string;
   msupply: string;
   price_btc: string;
+  image?: string;
 }
 
 export interface CryptoResponse {
@@ -27,4 +28,11 @@ export interface GlobalStats {
   btc_d: string;
   eth_d: string;
   mcap_change: string;
+}
+
+export interface CoinGeckoData {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
 }

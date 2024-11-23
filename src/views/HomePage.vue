@@ -18,8 +18,8 @@
             <ion-label>Rank</ion-label>
           </ion-segment-button>
           <ion-segment-button value="gainers">
-            <ion-label>Gainers</ion-label>
-          </ion-segment-button>
+            <ion-label>Gainers</ion-label></ion-segment-button
+          >
           <ion-segment-button value="losers">
             <ion-label>Losers</ion-label>
           </ion-segment-button>
@@ -164,7 +164,7 @@ import {
 } from "@ionic/vue";
 import MessageListItem from "@/components/MessageListItem.vue";
 import { ref, computed, onMounted, watch } from "vue";
-import type { Crypto, GlobalStats } from "@/types";
+import type { Crypto, GlobalStats, CoinGeckoData } from "@/types";
 import {
   analytics,
   barChart,
@@ -184,24 +184,58 @@ const sortCache = new Map();
 
 const fetchData = async (start = 0) => {
   try {
-    const response = await fetch(
-      `https://api.coinlore.net/api/tickers/?start=${start}&limit=${itemsPerPage}`
+    isLoading.value = true;
+    const [coinLoreResponse, coingeckoResponse] = await Promise.all([
+      fetch(
+        `https://api.coinlore.net/api/tickers/?start=${start}&limit=${itemsPerPage}`
+      ),
+      fetch(
+        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=250"
+      ),
+    ]);
+
+    const coinLoreData = await coinLoreResponse.json();
+    const coingeckoData: CoinGeckoData[] = await coingeckoResponse.json();
+
+    // Create maps for both symbol and name matching
+    const imageMapBySymbol = new Map(
+      coingeckoData.map((coin) => [coin.symbol.toLowerCase(), coin.image])
     );
-    const json = await response.json();
+    const imageMapByName = new Map(
+      coingeckoData.map((coin) => [coin.name.toLowerCase(), coin.image])
+    );
+
+    // Merge the data with better matching logic
+    const mergedData = coinLoreData.data.map((coin: Crypto) => {
+      // Try to find image by symbol first, then by name
+      const image =
+        imageMapBySymbol.get(coin.symbol.toLowerCase()) ||
+        imageMapByName.get(coin.name.toLowerCase());
+
+      return {
+        ...coin,
+        image: image || null, // Set to null if no image found
+      };
+    });
+
+    // Debug log to check image mapping
+    console.log("Sample merged data:", mergedData.slice(0, 5));
 
     if (start === 0) {
-      cryptos.value = json.data;
+      cryptos.value = mergedData;
     } else {
-      cryptos.value = [...cryptos.value, ...json.data];
+      cryptos.value = [...cryptos.value, ...mergedData];
     }
 
     sortCache.clear();
 
-    if (json.data.length < itemsPerPage) {
+    if (coinLoreData.data.length < itemsPerPage) {
       isAllLoaded.value = true;
     }
   } catch (error) {
     console.error("Error fetching crypto data:", error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
