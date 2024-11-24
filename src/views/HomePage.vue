@@ -197,7 +197,6 @@ const fetchData = async (start = 0) => {
     const coinLoreData = await coinLoreResponse.json();
     const coingeckoData: CoinGeckoData[] = await coingeckoResponse.json();
 
-    // Create maps for both symbol and name matching
     const imageMapBySymbol = new Map(
       coingeckoData.map((coin) => [coin.symbol.toLowerCase(), coin.image])
     );
@@ -205,20 +204,17 @@ const fetchData = async (start = 0) => {
       coingeckoData.map((coin) => [coin.name.toLowerCase(), coin.image])
     );
 
-    // Merge the data with better matching logic
     const mergedData = coinLoreData.data.map((coin: Crypto) => {
-      // Try to find image by symbol first, then by name
       const image =
         imageMapBySymbol.get(coin.symbol.toLowerCase()) ||
         imageMapByName.get(coin.name.toLowerCase());
 
       return {
         ...coin,
-        image: image || null, // Set to null if no image found
+        image: image || null,
       };
     });
 
-    // Debug log to check image mapping
     console.log("Sample merged data:", mergedData.slice(0, 5));
 
     if (start === 0) {
